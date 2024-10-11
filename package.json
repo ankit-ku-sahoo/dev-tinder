@@ -1,0 +1,20 @@
+{
+  "name": "devtinder",
+  "version": "1.0.0",
+  "description": "A Tinder-like application for Developers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "keywords": [
+    "nodejs",
+    "javascript"
+  ],
+  "author": "Ankit",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.1"
+  }
+}
