@@ -2,12 +2,29 @@ const express = require("express")
 
 const app = express()
 
-app.use("/nodemon", (req,res) => {
-    res.send("Nodemon is also working!! ")
+// This GET call will work for "abc" as well as "ac", basically anything before ? is optional
+app.get("/ab?c", (req,res) => {
+    res.send("Working with ? ")
 });
 
-app.use("/test", (req,res) => {
-    res.send("This is for testing purpose... Voila, It's working!! ")
+// This GET call will work for "abc", "abbc" and so on...
+app.get("/(ab)+c", (req,res) => {
+    res.send("Working with + ")
+});
+
+// This GET call will work for "ab" + {anything} + "c"
+app.get("/ab*c", (req,res) => {
+    res.send("Working with * ")
+});
+
+app.get("/user/:userID/:name", (req,res) => {
+    console.log(req.params)
+    res.send("Working with * ")
+});
+
+app.get("/user", (req,res) => {
+    console.log(req.query)
+    res.send("Working with * ")
 });
 
 app.use((req,res) => {
