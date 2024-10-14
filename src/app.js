@@ -2,8 +2,21 @@ const express = require("express")
 
 const app = express()
 
-app.use("/nodemon", (req,res) => {
+// This will handle only GET Calls to /nodemon
+app.get("/nodemon", (req,res) => {
     res.send("Nodemon is also working!! ")
+});
+
+app.get("/user", (req,res) => {
+    res.send({"firstname": "Ankit Kumar", "lastname": "Sahoo"})
+});
+
+app.post("/user", (req,res) => {
+    res.send("Successfully saved data to DB...")
+});
+
+app.delete("/user", (req,res) => {
+    res.send("Successfully deleted data from DB...")
 });
 
 app.use("/test", (req,res) => {
