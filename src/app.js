@@ -1,35 +1,33 @@
 const express = require("express")
+const { adminAuth, userAuth } = require("./middlewares/auth")
 
 const app = express()
 
-// This GET call will work for "abc" as well as "ac", basically anything before ? is optional
-app.get("/ab?c", (req,res) => {
-    res.send("Working with ? ")
-});
+app.use(
+    "/user/login", 
+    (req,res) => {
+        res.send("User has been logged in... ")
+    }
+)
 
-// This GET call will work for "abc", "abbc" and so on...
-app.get("/(ab)+c", (req,res) => {
-    res.send("Working with + ")
-});
+app.use(
+    "/user", 
+    userAuth,
+    (req,res) => {
+        console.log("Inside /user")
+        res.send("Handling route /user... ")
+    }
+)
 
-// This GET call will work for "ab" + {anything} + "c"
-app.get("/ab*c", (req,res) => {
-    res.send("Working with * ")
-});
+app.use("/admin", adminAuth)
 
-app.get("/user/:userID/:name", (req,res) => {
-    console.log(req.params)
-    res.send("Working with * ")
-});
+app.use("/admin/getAllUserData", (req,res) => {
+    res.send("All user data sent")
+})
 
-app.get("/user", (req,res) => {
-    console.log(req.query)
-    res.send("Working with * ")
-});
-
-app.use((req,res) => {
-    res.send("Hello from the server!")
-});
+app.use("/", (err,req,res,next) => {
+    res.send(500).send("Something went wrong")
+})
 
 app.listen(3001, () => {
     console.log("Server is successfully listening on port 3001... ")
