@@ -25,6 +25,10 @@ app.use("/admin/getAllUserData", (req,res) => {
     res.send("All user data sent")
 })
 
+app.use("/", (err,req,res,next) => {
+    res.send(500).send("Something went wrong")
+})
+
 app.listen(3001, () => {
     console.log("Server is successfully listening on port 3001... ")
 });
