@@ -6,6 +6,8 @@ const app = express()
 
 app.use(express.json())
 
+const options = {returnDocument: "after", runValidators: true}
+
 app.post("/signup", async (req, res) => {
     const userObj = req.body
 
@@ -16,9 +18,30 @@ app.post("/signup", async (req, res) => {
         res.send("User added successfully...")
     }
     catch (err) {
-        res.status(400).send("Error saving the user...")
+        res.status(400).send("Error saving the user..."+ err)
     }
     
+})
+
+app.get("/user/:userId", async (req, res) => {
+    const userId = req.params?.userId
+
+    console.log(userId)
+
+    try {
+        const user = await User.findOne({ "_id": userId })
+
+        if(user === null) {
+            res.status(404).send("No user found")
+        }
+        else{
+            res.send(user)
+        }
+        
+    }
+    catch (err) {
+        res.status(400).send(err)
+    }
 })
 
 app.get("/user", async (req, res) => {
@@ -52,29 +75,25 @@ app.delete("/user", async (req, res) => {
 
 })
 
-app.patch("/user", async (req, res) => {
-    const userId = req.body.userId
-    const updatedUserDetails = {...req.body, "_id": req.body.userId}
-    
-    try{
-        const user = await User.findByIdAndUpdate(userId, updatedUserDetails, {returnDocument: "after"});
-        res.send(user)
-    }
-    catch (err) {
-        res.status(400).send("Something went wrong")
-    }
-})
-
-app.patch("/user/:emailId", async (req, res) => {
-    const emailId = req.params.emailId
+app.patch("/user/:userId", async (req, res) => {
+    const userId = req.params?.userId
     const updatedUserDetails = req.body
 
-    console.log(emailId)
-
+    console.log(userId)
 
     try{
-        const user = await User.findOneAndUpdate({ emailId: emailId }, updatedUserDetails, {returnDocument: "after"});
-        if(user.length === 0){
+        const ALLOWED_UPDATES = ["age", "photoUrl", "skills", "about", "gender", "password"]
+
+        const isUpdateAllowed = Object.keys(updatedUserDetails).every((val) => {
+            return ALLOWED_UPDATES.includes(val)
+        })
+
+        if(!isUpdateAllowed){
+            throw new Error("Update not Allowed")
+        }
+
+        const user = await User.findOneAndUpdate({ "_id": userId }, updatedUserDetails, options);
+        if(user === null){
             res.status(404).send("User not found")
         }
         else{
@@ -82,7 +101,20 @@ app.patch("/user/:emailId", async (req, res) => {
         }
     }
     catch (err) {
-        res.status(400).send("Something went wrong")
+        res.status(400).send("Something went wrong..."+ err)
+    }
+})
+
+app.patch("/user", async (req, res) => {
+    const userId = req.body.userId
+    const updatedUserDetails = {...req.body, "_id": req.body.userId}
+    
+    try{
+        const user = await User.findByIdAndUpdate(userId, updatedUserDetails, options);
+        res.send(user)
+    }
+    catch (err) {
+        res.status(400).send("Something went wrong"+ err)
     }
 })
 
