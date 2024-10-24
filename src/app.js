@@ -1,26 +1,58 @@
 const express = require("express")
 const { connectDB } = require("./config/database")
 const User = require("./models/user")
+const { validateUserSignups } = require("./utils/validation")
+const bcrypt = require("bcrypt")
 
 const app = express()
 
 app.use(express.json())
 
 const options = {returnDocument: "after", runValidators: true}
+const saltValue = 10
 
 app.post("/signup", async (req, res) => {
-    const userObj = req.body
-
-    const user = new User(userObj)
-
     try{
+        validateUserSignups(req)
+        const {firstName, lastName, emailId, password, gender, age } = req.body
+
+        const passwordHash = await bcrypt.hash(password, saltValue)
+        console.log(passwordHash)
+    
+        const user = new User({
+            firstName, lastName, emailId, gender, age, password: passwordHash
+        })
+
         await user.save()
         res.send("User added successfully...")
     }
     catch (err) {
-        res.status(400).send("Error saving the user..."+ err)
+        res.status(400).send("ERROR: " + err.message)
     }
     
+})
+
+app.post("/login", async (req, res) => {
+    try{
+        const {emailId, password} = req.body
+
+        const user = await User.findOne({ emailId})
+
+        if(!user) {
+            throw new Error("Email or password is not correct.")
+        }
+
+        const isPasswordCorrect = await bcrypt.compare(password, user.password)
+        if(!isPasswordCorrect) {
+            throw new Error("Email or password is not correct.")
+        }
+
+        res.send("Login successful")
+
+    }
+    catch (err) {
+        res.status(400).send("ERROR: " + err.message)
+    }
 })
 
 app.get("/user/:userId", async (req, res) => {
