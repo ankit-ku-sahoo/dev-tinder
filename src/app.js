@@ -3,13 +3,17 @@ const { connectDB } = require("./config/database")
 const User = require("./models/user")
 const { validateUserSignups } = require("./utils/validation")
 const bcrypt = require("bcrypt")
+const cookieParser = require("cookie-parser")
+const { userAuth } = require("./middlewares/auth")
 
 const app = express()
 
 app.use(express.json())
+app.use(cookieParser())
 
 const options = {returnDocument: "after", runValidators: true}
 const saltValue = 10
+const cookieActivityDurationInSeconds = 7*24*60*60 // 7 days in seconds
 
 app.post("/signup", async (req, res) => {
     try{
@@ -36,19 +40,33 @@ app.post("/login", async (req, res) => {
     try{
         const {emailId, password} = req.body
 
-        const user = await User.findOne({ emailId})
+        const user = await User.findOne({ emailId })
 
         if(!user) {
             throw new Error("Email or password is not correct.")
         }
 
-        const isPasswordCorrect = await bcrypt.compare(password, user.password)
+        const isPasswordCorrect = await user.validatePassword(password);
         if(!isPasswordCorrect) {
             throw new Error("Email or password is not correct.")
         }
 
+        const token = await user.getJWT()
+        
+        const expiryDate = new Date(Date.now()+cookieActivityDurationInSeconds*1000)
+        res.cookie("token", token, {"expires": expiryDate})
         res.send("Login successful")
 
+    }
+    catch (err) {
+        res.status(400).send("ERROR: " + err.message)
+    }
+})
+
+app.get("/profile", userAuth, async (req, res) => {
+    try{
+        const user = req.user
+        res.send(user)
     }
     catch (err) {
         res.status(400).send("ERROR: " + err.message)
