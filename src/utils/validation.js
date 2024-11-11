@@ -7,9 +7,14 @@ const validateUserSignups = (req) => {
         throw new Error("Please enter a first name")
     } else if (!lastName) {
         throw new Error("Please enter a last name")
-    } else if (!validator.isStrongPassword(password)) {
+    }
+    validatePassword(password)
+}
+
+const validatePassword = (password) => {
+    if (!validator.isStrongPassword(password)) {
         throw new Error("Please enter a strong password!")
     }
 }
 
-module.exports = { validateUserSignups }
+module.exports = { validateUserSignups, validatePassword }
