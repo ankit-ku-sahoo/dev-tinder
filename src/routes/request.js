@@ -15,7 +15,7 @@ route.post("/request/send/:status/:toUserId", userAuth, async (req, res) => {
         const ALLOWED_STATUS = ["interested", "ignored"]
         const isAllowedStatus = ALLOWED_STATUS.includes(status)
         if(!isAllowedStatus){
-            res.status(400).json({message: `${status} is not allowed`})
+            throw new Error(`${status} is not allowed`)
         }
 
         // Cannot send request to itself
