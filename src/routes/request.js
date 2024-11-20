@@ -5,6 +5,8 @@ const { userAuth } = require("../middlewares/auth")
 const ConnectionRequest = require("../models/connections")
 const User = require("../models/user")
 
+const USER_SAFE_DETAILS = ["firstName", "lastName", "age", "gender", "about", "photoUrl", "skills"]
+
 route.post("/request/send/:status/:toUserId", userAuth, async (req, res) => {
     try{
         const fromUserId = req.user._id;
@@ -43,6 +45,38 @@ route.post("/request/send/:status/:toUserId", userAuth, async (req, res) => {
         res.send({message: `Request sent. Current status: ${status}`,
             connectionDetails: connectionRequest
         })
+    }
+    catch (err) {
+        res.status(400).json({ message: err.message })
+    }
+})
+
+route.post("/request/review/:status/:requestId", userAuth, async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const requestId = req.params.requestId;
+        const status = req.params.status;
+
+        // Only selected statuses allowed
+        const ALLOWED_STATUS = ["accepted", "rejected"]
+        const isAllowedStatus = ALLOWED_STATUS.includes(status)
+        if(!isAllowedStatus){
+            throw new Error(`${status} is not allowed`)
+        }
+
+        const connectionRequest = await ConnectionRequest.findOne({ 
+            _id: requestId, 
+            toUserId: userId,
+            status: "interested"
+        })
+
+        if(connectionRequest == null){
+            throw new Error("No valid request found.")
+        }
+        connectionRequest.status = status
+
+        connectionRequest.save()
+        res.json({message: `Request ${status} successfully.`, data: connectionRequest})
     }
     catch (err) {
         res.status(400).json({ message: err.message })
