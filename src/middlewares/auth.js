@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken")
 const User = require("../models/user")
+require('dotenv').config();
 
-const privateKey = "DevTinder@690"
+const privateKey = process.env.TOKEN_PRIVATE_KEY || "DevTinder@690"
 
 const userAuth = async (req, res, next) => {
     try{

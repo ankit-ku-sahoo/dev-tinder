@@ -4,8 +4,9 @@ const route = express.Router();
 const { userAuth } = require("../middlewares/auth")
 const ConnectionRequest = require("../models/connections")
 const User = require("../models/user")
+require('dotenv').config();
 
-const USER_SAFE_DETAILS = ["firstName", "lastName", "age", "gender", "about", "photoUrl", "skills"]
+const USER_SAFE_DETAILS = process.env.USER_SAFE_DETAILS.split(',');
 
 route.get("/feed", userAuth, async (req, res) => {
     try {

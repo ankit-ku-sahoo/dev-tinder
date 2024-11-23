@@ -5,8 +5,6 @@ const { userAuth } = require("../middlewares/auth")
 const ConnectionRequest = require("../models/connections")
 const User = require("../models/user")
 
-const USER_SAFE_DETAILS = ["firstName", "lastName", "age", "gender", "about", "photoUrl", "skills"]
-
 route.post("/request/send/:status/:toUserId", userAuth, async (req, res) => {
     try{
         const fromUserId = req.user._id;

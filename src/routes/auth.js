@@ -3,9 +3,10 @@ const User = require("../models/user")
 const { validateUserSignups } = require("../utils/validation")
 const bcrypt = require("bcrypt")
 const route = express.Router();
+require('dotenv').config();
 
-const saltValue = 10
-const cookieActivityDurationInSeconds = 7*24*60*60 // 7 days in seconds
+const saltValue = process.env.SALT_VALUE|| 10
+const cookieActivityDurationInSeconds = process.env.COOKIE_ACTIVITY_DURATION_SECONDS || 7*24*60*60 // 7 days in seconds
 
 route.post("/signup", async (req, res) => {
     try{

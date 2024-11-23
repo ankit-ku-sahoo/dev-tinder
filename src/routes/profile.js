@@ -3,8 +3,9 @@ const bcrypt = require("bcrypt")
 const { userAuth } = require("../middlewares/auth")
 const { validatePassword } = require("../utils/validation")
 const route = express.Router()
+require('dotenv').config();
 
-const saltValue = 10
+const saltValue = process.env.SALT_VALUE|| 10
 
 route.get("/view", userAuth, async (req, res) => {
     try{

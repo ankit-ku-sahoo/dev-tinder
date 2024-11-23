@@ -2,9 +2,10 @@ const mongoose = require("mongoose")
 const validator = require("validator")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
+require('dotenv').config();
 
-const privateKey = "DevTinder@690"
-const tokenValidity = 7*24*60*60
+const privateKey = process.env.TOKEN_PRIVATE_KEY || "DevTinder@690"
+const tokenValidity = process.env.COOKIE_ACTIVITY_DURATION_SECONDS || 7*24*60*60
 
 const userSchema = new mongoose.Schema({
     firstName: {
